@@ -5,28 +5,43 @@ require 'prologix_gpib_usb/version'
 module PrologixGpibUsb
   require 'rubyserial'
   class Error < StandardError; end
+  attr_accessor address
 
   def open_connection
-    times_tried = 0
-    max_tries = 9
-    controller_found = false
-
-    until controller_found
-      begin
-        serial_port = Serial.new("/dev/ttyUSB#{count}")
-        serial_port.write("++ver\r\n")
-        puts 'Made connection' if serial_port.gets.include? 'Prologix'
-      rescue Errno::ENOENT
-        break if (times_tried += 1) >= max_tries
-
-        puts 'File not found.'
-      rescue Errno::EACCES
-        puts 'Insufficient permissions, not allowed to open file.'
-      end
+    if RubySerial::ON_LINUX
+      @serial_port = Serial.new('/dev/tty.USB0')
+    elsif RubySerial::ON_WINDOWS
+      puts 'TODO: Implement find device for Windows'
+    else
+      @serial_port = Serial.new('/dev/tty.usbserial-PX9HPBMB')
     end
+    @serial_port.write("++ver\r\n")
+    puts 'Connection made successfully.' if @serial_port.gets.include? 'Prologix'
+  rescue StandardError => e
+    puts e.message
+    puts e.backtrace.inspect
   end
 
   def reset
-    serial_port = Serial.new('/dev/ttyUSB0')
+    @serial_port.write("++clr\r\n") unless not_connected?
   end
+
+  def address=(addr)
+    @serial_port.write("++addr #{addr}\r\n") unless not_connected?
+  end
+
+  def address
+    not_connected? ? return : @serial_port.write("++addr\r\n")
+
+    puts @serial_port.gets
+  end
+end
+
+private
+def not_connected?
+  !@serial_port.closed?
+end
+
+class GpibController
+  include PrologixGpibUsb
 end
