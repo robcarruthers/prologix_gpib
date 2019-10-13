@@ -26,6 +26,25 @@ Or install it yourself as:
 
 TODO: Write usage instructions here
 
+Open irb inside the gem folder
+
+    irb -I lib
+
+With the Prologix connected
+
+    irb(main):001:0> require 'prologix_gpib_usb.rb'
+    => true
+
+    irb(main):002:0> device = GpibController.new
+    => #<GpibController:0x00007ff73f08afa0>
+
+    irb(main):003:0> device.open_connection
+    Connection made successfully.
+    => nil
+
+    irb(main):004:0> device.version
+    => "Prologix GPIB-USB Controller version 6.101\r\n"
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

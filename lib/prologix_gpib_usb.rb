@@ -5,7 +5,7 @@ require 'prologix_gpib_usb/version'
 module PrologixGpibUsb
   require 'rubyserial'
   class Error < StandardError; end
-  attr_accessor address
+  attr_accessor :address
 
   def open_connection
     if RubySerial::ON_LINUX
@@ -24,6 +24,11 @@ module PrologixGpibUsb
 
   def reset
     @serial_port.write("++clr\r\n") unless not_connected?
+  end
+
+  def version
+    @serial_port.write("++ver\r\n")
+    @serial_port.gets
   end
 
   def address=(addr)
