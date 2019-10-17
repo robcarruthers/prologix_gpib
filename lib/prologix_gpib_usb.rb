@@ -10,7 +10,7 @@ module PrologixGpibUsb
 
   def open_connection
     path_str, dir = if RubySerial::ON_LINUX
-                      ['tty.USB', '/dev/']
+                      ['ttyUSB', '/dev/']
                     elsif RubySerial::ON_WINDOWS
                       ['TODO: Implement find device for Windows', 'You lazy bugger']
                     else
