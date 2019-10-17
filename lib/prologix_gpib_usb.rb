@@ -6,6 +6,8 @@ module PrologixGpibUsb
   require 'rubyserial'
   class Error < StandardError; end
 
+  EOL = "\r\n"
+
   def open_connection
     path_str, dir = if RubySerial::ON_LINUX
                       ['tty.USB', '/dev/']
@@ -18,10 +20,12 @@ module PrologixGpibUsb
     paths = directory.each_child.select { |name| name.include?(path_str) }
     paths.each do |path|
       @serial_port = Serial.new(directory.path + path)
-      @serial_port.write("++ver\r\n")
-      return true if @serial_port.gets.include? 'Prologix'
+      write('++ver')
+      next unless readline.include? 'Prologix'
 
-      @serial_port.close
+      set_auto_read_after_write :disable
+      set_operation_mode :controller
+      return true
     end
     raise Error, 'ConnectionError: No Prologix devices found.'
   end
@@ -30,19 +34,20 @@ module PrologixGpibUsb
     return unless connected?
 
     @serial_port.close
-    @serial_port = nil?
+    @serial_port = nil
+    @serial_port.nil?
   end
 
-  def write(_str)
+  def write(str)
     return unless connected?
 
-    @serial_port.write(_str)
+    @serial_port.write("#{str}#{EOL}")
   end
 
-  def read(_bytes)
+  def read(bytes)
     return unless connected?
 
-    @serial_port.read(_bytes)
+    @serial_port.read(bytes)
   end
 
   def readline
@@ -51,24 +56,74 @@ module PrologixGpibUsb
     @serial_port.gets.chomp
   end
 
-  def version
-    return unless connected?
+  def set_read_timeout(milliseconds)
+    return unless connected? || milliseconds.class != Integer
 
-    @serial_port.write("++ver\r\n")
+    write("++read_tmo_ms #{milliseconds}")
+  end
+
+  def set_mode(op_mode)
+    case op_mode
+    when 0, 1
+      write("++mode #{op_mode}")
+    when :controller
+      set_mode(1)
+    when :device
+      set_mode(0)
+    end
+  end
+  alias set_operation_mode set_mode
+
+  def mode
+    write('++mode')
+    readline
+  end
+  alias operation_mode mode
+
+  def set_auto(auto_mode)
+    case auto_mode
+    when 0, 1
+      write("++auto #{auto_mode}")
+    when :talk, :enable
+      set_auto(1)
+    when :listen, :disable
+      set_auto(0)
+    end
+  end
+  alias set_auto_read_after_write set_auto
+
+  def auto
+    write('++auto')
+    readline
+  end
+  alias auto_read_after_write auto
+
+  def version
+    write('++ver')
     readline
   end
 
-  def address=(addr)
-    return unless connected?
+  def set_addr(addr)
+    write("++addr #{addr}")
+  end
+  alias set_address set_addr
 
-    @serial_port.write("++addr #{addr}\r\n")
+  def addr
+    write('++addr')
+    readline
+  end
+  alias address addr
+
+  def trigger(addr_list = [addr])
+    write("++trg #{addr_list.join(' ')}")
   end
 
-  def address
-    return unless connected?
+  def clr
+    write('++clr')
+  end
 
-    @serial_port.write("++addr\r\n")
-    @serial_port.gets.chomp
+  def reset
+    write('++rst')
   end
 
   private

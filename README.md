@@ -32,7 +32,7 @@ Open irb inside the gem folder
 
 With the Prologix connected
 
-    irb(main):002:0> device = GpibController.new
+    irb(main):002:0> device = Gpib.new
     => #<GpibController:0x00007ff73f08afa0>
 
     irb(main):003:0> device.open_connection
