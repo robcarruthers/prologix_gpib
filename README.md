@@ -28,12 +28,9 @@ TODO: Write usage instructions here
 
 Open irb inside the gem folder
 
-    irb -I lib
+    bin/console
 
 With the Prologix connected
-
-    irb(main):001:0> require 'prologix_gpib_usb.rb'
-    => true
 
     irb(main):002:0> device = GpibController.new
     => #<GpibController:0x00007ff73f08afa0>

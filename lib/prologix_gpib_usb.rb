@@ -5,48 +5,83 @@ require 'prologix_gpib_usb/version'
 module PrologixGpibUsb
   require 'rubyserial'
   class Error < StandardError; end
-  attr_accessor :address
 
   def open_connection
-    if RubySerial::ON_LINUX
-      @serial_port = Serial.new('/dev/tty.USB0')
-    elsif RubySerial::ON_WINDOWS
-      puts 'TODO: Implement find device for Windows'
-    else
-      @serial_port = Serial.new('/dev/tty.usbserial-PX9HPBMB')
+    path_str, dir = if RubySerial::ON_LINUX
+                      ['tty.USB', '/dev/']
+                    elsif RubySerial::ON_WINDOWS
+                      ['TODO: Implement find device for Windows', 'You lazy bugger']
+                    else
+                      ['tty.usbserial', '/dev/']
+                    end
+    directory = Dir.new dir
+    paths = directory.each_child.select { |name| name.include?(path_str) }
+    paths.each do |path|
+      @serial_port = Serial.new(directory.path + path)
+      @serial_port.write("++ver\r\n")
+      return true if @serial_port.gets.include? 'Prologix'
+
+      @serial_port.close
     end
-    @serial_port.write("++ver\r\n")
-    puts 'Connection made successfully.' if @serial_port.gets.include? 'Prologix'
-  rescue StandardError => e
-    puts e.message
-    puts e.backtrace.inspect
+    raise Error, 'ConnectionError: No Prologix devices found.'
   end
 
-  def reset
-    @serial_port.write("++clr\r\n") unless not_connected?
+  def close_connection
+    return unless connected?
+
+    @serial_port.close
+    @serial_port = nil?
+  end
+
+  def write(_str)
+    return unless connected?
+
+    @serial_port.write(_str)
+  end
+
+  def read(_bytes)
+    return unless connected?
+
+    @serial_port.read(_bytes)
+  end
+
+  def readline
+    return unless connected?
+
+    @serial_port.gets.chomp
   end
 
   def version
+    return unless connected?
+
     @serial_port.write("++ver\r\n")
-    @serial_port.gets
+    readline
   end
 
   def address=(addr)
-    @serial_port.write("++addr #{addr}\r\n") unless not_connected?
+    return unless connected?
+
+    @serial_port.write("++addr #{addr}\r\n")
   end
 
   def address
-    not_connected? ? return : @serial_port.write("++addr\r\n")
+    return unless connected?
 
-    puts @serial_port.gets
+    @serial_port.write("++addr\r\n")
+    @serial_port.gets.chomp
+  end
+
+  private
+
+  def connected?
+    if @serial_port.nil?
+      raise Error, 'ConnectionError: No open Prologix device connections.'
+    end
+
+    true
   end
 end
 
-private
-def not_connected?
-  !@serial_port.closed?
-end
-
-class GpibController
+class Gpib
   include PrologixGpibUsb
 end
