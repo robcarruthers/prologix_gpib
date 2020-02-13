@@ -22,6 +22,26 @@ Or install it yourself as:
 
     $ gem install prologix_gpib_usb
 
+If you get a "bash: gem: command not found" error, do this:
+
+````bash
+sudo apt-get install ruby ruby-dev
+sudo apt-get install rubygems
+````
+
+Ref: https://stackoverflow.com/questions/9485083/gem-command-not-found
+
+## Building the gem
+
+If you have to build the gem:
+
+````bash
+sudo gem install bundler
+bundle
+gem build prologix_gpib_usb
+sudo gem install prologix_gpib_usb-x.x.x.gem   # x.x.x is the version number
+````
+
 ## Usage
 
 TODO: Write usage instructions here
@@ -30,7 +50,9 @@ TODO: Write usage instructions here
 
 Open irb inside the gem folder
 
-    bin/console
+````bash
+bin/console
+````
 
 With the Prologix GPIB/USB connected
 

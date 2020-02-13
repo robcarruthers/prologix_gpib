@@ -17,9 +17,14 @@ module PrologixGpibUsb
                       ['tty.usbserial', '/dev/']
                     end
     directory = Dir.new dir
-    paths = directory.each_child.select { |name| name.include?(path_str) }
-    paths.each do |path|
-      @serial_port = Serial.new(directory.path + path)
+    # puts dir
+    # puts path_str
+    # paths = directory.each_child.select { |name| name.include?(path_str) }
+    # paths.each do |path|
+    Dir.glob( "#{dir}#{path_str}*" ) do |path|    # { |child| puts child }
+        puts path
+        # @serial_port = Serial.new(directory.path + path)
+        @serial_port = Serial.new(path)
       write('++ver')
       next unless readline.include? 'Prologix'
 
