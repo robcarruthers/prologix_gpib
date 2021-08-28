@@ -8,7 +8,7 @@ module PrologixGpibUsb
 
   EOL = "\r\n"
 
-  def open_connection
+  def open
     path_str, dir = if RubySerial::ON_LINUX
                       ['ttyUSB', '/dev/']
                     elsif RubySerial::ON_WINDOWS
@@ -16,15 +16,9 @@ module PrologixGpibUsb
                     else
                       ['tty.usbserial', '/dev/']
                     end
-    directory = Dir.new dir
-    # puts dir
-    # puts path_str
-    # paths = directory.each_child.select { |name| name.include?(path_str) }
-    # paths.each do |path|
-    Dir.glob( "#{dir}#{path_str}*" ) do |path|    # { |child| puts child }
-        puts path
-        # @serial_port = Serial.new(directory.path + path)
-        @serial_port = Serial.new(path)
+
+    Dir.glob( "#{dir}#{path_str}*" ) do |path|
+      @serial_port = Serial.new(path)
       write('++ver')
       next unless readline.include? 'Prologix'
 
@@ -35,7 +29,7 @@ module PrologixGpibUsb
     raise Error, 'ConnectionError: No Prologix devices found.'
   end
 
-  def close_connection
+  def close
     return unless connected?
 
     @serial_port.close
