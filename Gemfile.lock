@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    prologix_gpib_usb (0.1.1)
+    prologix_gpib_usb (0.2.0)
       activesupport
       rubyserial
 

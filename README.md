@@ -22,54 +22,49 @@ Or install it yourself as:
 
     $ gem install prologix_gpib_usb
 
-If you get a "bash: gem: command not found" error, do this:
-
-````bash
-sudo apt-get install ruby ruby-dev
-sudo apt-get install rubygems
-````
-
-Ref: https://stackoverflow.com/questions/9485083/gem-command-not-found
-
-## Building the gem
-
-If you have to build the gem:
-
-````bash
-sudo gem install bundler
-bundle
-gem build prologix_gpib_usb
-sudo gem install prologix_gpib_usb-x.x.x.gem   # x.x.x is the version number
-````
-
 ## Usage
 
-TODO: Write usage instructions here
+TODO: Write better usage instructions here
+
+## Firmware update
+
+Some of the Device commands require the latest firmware.
+
+```irb
+device.version
+=> "Prologix GPIB-USB Controller version 6.107"
+```
+
+More details here:
+http://prologix.biz/gpib-usb-6.0-firmware-update.html
+
+Download FTDI drivers for Windows
+https://ftdichip.com/wp-content/uploads/2021/08/CDM212364_Setup.zip
 
 ## Playing in Console
 
 Open irb inside the gem folder
 
-````bash
+```bash
 bin/console
-````
+```
 
 With the Prologix GPIB/USB connected
 
-    irb(main):002:0> device = Gpib.new
-    => #<GpibController:0x00007ff73f08afa0>
+```ruby
+❯ bin/console
+irb(main):001:0> device = GpibUsb.new(:controller, device_address: 8)
+=> #<GpibUsb:0x00007fc1bb2fed90>
 
-    irb(main):003:0> device.open_connection
-    => true
+irb(main):002:0> device.open
+=> true
 
-    irb(main):004:0> device.version
-    => "Prologix GPIB-USB Controller version 6.101\r\n"
+irb(main):003:0> device.version
+=> "Prologix GPIB-USB Controller version 6.107"
 
-    irb(main):005:0> device.set_operation_mode :controller
-    => 10
-
-    irb(main):006:0> device.set_auto :listen
-    => 10
+irb(main):004:0> device.auto = :listen
+=> :listen
+```
 
 ## Development
 
