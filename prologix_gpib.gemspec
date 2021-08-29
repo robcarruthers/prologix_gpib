@@ -2,16 +2,16 @@
 
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'prologix_gpib_usb/version'
+require 'prologix_gpib/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'prologix_gpib_usb'
-  spec.version       = PrologixGpibUsb::VERSION
+  spec.name          = 'prologix_gpib'
+  spec.version       = PrologixGpib::VERSION
   spec.authors       = ['Rob Carruthers']
   spec.email         = ['robcarruthers@mac.com']
 
-  spec.summary       = 'Prologix GPIB USB controiller driver for ruby.'
-  spec.description   = 'Prologix GPIB USB controiller driver for ruby.'
+  spec.summary       = 'Prologix GPIB controller ruby wrapper.'
+  spec.description   = 'Ruby wrapper for the Prologix GPIB controllers, USB & Ethernet.'
   spec.homepage      = 'https://codemuster.co.nz'
 
   spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"

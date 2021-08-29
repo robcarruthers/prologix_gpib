@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    prologix_gpib_usb (0.2.0)
+    prologix_gpib (0.2.0)
       activesupport
       rubyserial
 
@@ -31,7 +31,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 2.0)
-  prologix_gpib_usb!
+  prologix_gpib!
   rake (~> 10.0)
   rubyserial
 

@@ -1,4 +1,4 @@
-module PrologixGpibUsb::Prologix
+module PrologixGpib::Usb
   require 'rubyserial'
   class Error < StandardError; end
 
