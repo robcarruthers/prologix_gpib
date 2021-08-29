@@ -46,13 +46,12 @@ https://ftdichip.com/wp-content/uploads/2021/08/CDM212364_Setup.zip
 Open irb inside the gem folder
 
 ```bash
-bin/console
+$ bin/console
 ```
 
 With the Prologix GPIB/USB connected
 
 ```ruby
-❯ bin/console
 irb(main):001:0> device = GpibUsb.new(:controller, device_address: 8)
 => #<GpibUsb:0x00007fc1bb2fed90>
 
