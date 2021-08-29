@@ -1,4 +1,4 @@
-# PrologixGpibUsb
+# PrologixGpib
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/prologix_gpib_usb`. To experiment with that code, run `bin/console` for an interactive prompt.
 
@@ -11,7 +11,7 @@ Uses the Prologix GPIB-USB controller to talk to a GPIB device.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'prologix_gpib_usb'
+gem 'prologix_gpib'
 ```
 
 And then execute:
@@ -20,13 +20,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install prologix_gpib_usb
+    $ gem install prologix_gpib
 
-## Usage
+## USB Controller
 
-TODO: Write better usage instructions here
-
-## Firmware update
+### Firmware update
 
 Some of the Device commands require the latest firmware.
 
@@ -41,7 +39,7 @@ http://prologix.biz/gpib-usb-6.0-firmware-update.html
 Download FTDI drivers for Windows
 https://ftdichip.com/wp-content/uploads/2021/08/CDM212364_Setup.zip
 
-## Playing in Console
+### Playing in Console
 
 Open irb inside the gem folder
 
@@ -52,8 +50,8 @@ $ bin/console
 With the Prologix GPIB/USB connected
 
 ```ruby
-irb(main):001:0> device = GpibUsb.new(:controller, device_address: 8)
-=> #<GpibUsb:0x00007fc1bb2fed90>
+irb(main):001:0> device = Prologix::UsbController.new(:controller, device_address: 7)
+=> #<Prologix::UsbController:0x00007faa2b8ecc40>
 
 irb(main):002:0> device.open
 => true
@@ -63,6 +61,9 @@ irb(main):003:0> device.version
 
 irb(main):004:0> device.auto = :listen
 => :listen
+
+irb(main):005:0> device.auto
+=> "1"
 ```
 
 ## Development
@@ -73,4 +74,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/prologix_gpib_usb.
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/prologix_gpib.

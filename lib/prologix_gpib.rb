@@ -2,7 +2,7 @@
 
 require 'prologix_gpib/version'
 require 'prologix_gpib/usb'
-require 'prologix_gpib/ethernet'
+require 'prologix_gpib/lan'
 
 module Prologix
   class UsbController
@@ -14,7 +14,7 @@ module Prologix
     end
   end
 
-  class EthController
-    include PrologixGpib::Ethernet
+  class LanController
+    include PrologixGpib::Lan
   end
 end
