@@ -5,21 +5,22 @@ module PrologixGpib::Usb
   EOL = "\r\n"
 
   def open
-    path_str, dir = if RubySerial::ON_LINUX
-                      ['ttyUSB', '/dev/']
-                    elsif RubySerial::ON_WINDOWS
-                      ['TODO: Implement find device for Windows', 'You lazy bugger']
-                    else
-                      ['tty.usbserial', '/dev/']
-                    end
+    path_str, dir =
+      if RubySerial::ON_LINUX
+        %w[ttyUSB /dev/]
+      elsif RubySerial::ON_WINDOWS
+        ['TODO: Implement find device for Windows', 'You lazy bugger']
+      else
+        %w[tty.usbserial /dev/]
+      end
 
-    Dir.glob( "#{dir}#{path_str}*" ) do |path|
+    Dir.glob("#{dir}#{path_str}*") do |path|
       @serial_port = Serial.new(path)
       write('++ver')
       next unless readline.include? 'Prologix'
 
-      set_auto_read_after_write :disable
-      set_operation_mode :controller
+      mode = @mode
+      address = @address
       return true
     end
     raise Error, 'ConnectionError: No Prologix devices found.'
@@ -58,14 +59,15 @@ module PrologixGpib::Usb
   end
 
   def mode=(op_mode)
-    new_mode = case op_mode
-    when :controller, 1, '1'
-      1
-    when :device, 0, '0'
-      0
-    else
-      ''
-    end
+    new_mode =
+      case op_mode
+      when :controller, 1, '1'
+        1
+      when :device, 0, '0'
+        0
+      else
+        ''
+      end
     write("++mode #{new_mode}")
   end
   alias set_operation_mode mode=
@@ -134,9 +136,7 @@ module PrologixGpib::Usb
   private
 
   def connected?
-    if @serial_port.nil?
-      raise Error, 'ConnectionError: No open Prologix device connections.'
-    end
+    raise Error, 'ConnectionError: No open Prologix device connections.' if @serial_port.nil?
 
     true
   end

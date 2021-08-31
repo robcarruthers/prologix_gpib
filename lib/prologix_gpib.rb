@@ -9,8 +9,8 @@ module Prologix
     include PrologixGpib::Usb
 
     def initialize(operational_mode = :controller, device_address: 9)
-      mode = operational_mode
-      address = device_address
+      @mode = operational_mode
+      @address = device_address
     end
   end
 
