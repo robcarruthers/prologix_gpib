@@ -13,6 +13,8 @@ Gem::Specification.new do |spec|
   spec.summary       = 'Prologix GPIB controller ruby wrapper.'
   spec.description   = 'Ruby wrapper for the Prologix GPIB controllers, USB & Ethernet.'
   spec.homepage      = 'https://codemuster.co.nz'
+  spec.license       = "MIT"
+
 
   spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
 
