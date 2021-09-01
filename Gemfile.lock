@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    prologix_gpib (0.3.0)
+    prologix_gpib (0.3.1)
       activesupport
       rubyserial
 
@@ -14,11 +14,16 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
+    coderay (1.1.3)
     concurrent-ruby (1.1.9)
     ffi (1.15.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    method_source (1.0.0)
     minitest (5.14.4)
+    pry (0.14.1)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
     rake (10.5.0)
     rubyserial (0.6.0)
       ffi (~> 1.9, >= 1.9.3)
@@ -32,6 +37,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.0)
   prologix_gpib!
+  pry
   rake (~> 10.0)
   rubyserial
 

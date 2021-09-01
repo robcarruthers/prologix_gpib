@@ -4,7 +4,7 @@ module PrologixGpib::Usb
 
   EOL = "\r\n"
 
-  def open
+  def open(interface_mode = :controller, device_address: 9)
     path_str, dir =
       if RubySerial::ON_LINUX
         %w[ttyUSB /dev/]
@@ -19,8 +19,8 @@ module PrologixGpib::Usb
       write('++ver')
       next unless readline.include? 'Prologix'
 
-      mode = @mode
-      address = @address
+      self.mode = interface_mode
+      self.address = device_address
       return true
     end
     raise Error, 'ConnectionError: No Prologix devices found.'
