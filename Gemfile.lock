@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    prologix_gpib (0.3.1)
+    prologix_gpib (0.3.2)
       activesupport
       rubyserial
 
