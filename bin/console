@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require "bundler/setup"
-require "prologix_gpib"
+require 'bundler/setup'
+require 'prologix_gpib'
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
@@ -9,6 +9,7 @@ require "prologix_gpib"
 # (If you use this, don't forget to add pry to your Gemfile!)
 # require "pry"
 # Pry.start
+plx = Prologix::UsbController.new
 
-require "irb"
+require 'irb'
 IRB.start(__FILE__)

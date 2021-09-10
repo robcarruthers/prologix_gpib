@@ -1,12 +1,25 @@
 module PrologixGpib::Usb::Commands
   def config
+    error_message = 'Error'
+    ver = version.split('version').map(&:strip)
+    return { error: error_message } unless ver.count == 2 && ver[0].include?('Prologix')
     conf = {}
-    conf[:version] = version
-    conf[:mode] = (mode == '1' ? 'Controller' : 'Device')
-    conf[:device_address] = address
-    conf[:auto_read] = (auto == '0' ? 'Disabled' : 'Enabled')
-    conf[:read_timeout] = "#{timeout}ms"
-    conf[:eoi_assertion] = (eoi == '0' ? 'Disabled' : 'Enabled')
+    conf[:device_name] = ver[0]
+    conf[:firmware] = ver[1]
+    conf[:mode] = { '1' => 'Controller', '0' => 'Device' }.fetch(mode, error_message)
+    conf[:device_address] = address[/([1-9])/].nil? ? error_message : address[/([1-9])/]
+    conf[:auto_read] = { '1' => 'Enabled', '0' => 'Disabled', 'Unrecognized command' => 'NA' }.fetch(auto, error_message)
+    tmo = timeout
+    conf[:read_timeout] =
+      case tmo
+      when 'Unrecognized command'
+        'NA'
+      when /([1-1000])/
+        tmo
+      else
+        error_message
+      end
+    conf[:eoi_assertion] = { '1' => 'Enabled', '0' => 'Disabled' }.fetch(eoi, error_message)
     conf[:eos] =
       case eos
       when '0'
@@ -17,11 +30,15 @@ module PrologixGpib::Usb::Commands
         'Append LF to instrument commands'
       when '3'
         'Do not append anything to instrument commands'
+      else
+        error_message
       end
-    conf[:eot] = (eot == '0' ? 'Disabled' : 'Enabled')
-    conf[:eot_char] = eot_char
+    conf[:eot] = { '1' => 'Enabled', '0' => 'Disabled' }.fetch(eot, error_message)
+    eot_str = eot_char
+    # conf[:eot_char] = eot_str.to_i.chr[/([ -~])/].nil? ? error_message : "'#{eot_str.to_i.chr}', ascii #{eot_str}"
     conf
   end
+
   #  This command configures the Prologix GPIB-USB controller to be a :controller or :device.
   def mode=(op_mode)
     mode =
@@ -38,8 +55,7 @@ module PrologixGpib::Usb::Commands
   alias set_operation_mode mode=
 
   def mode
-    write('++mode')
-    readline
+    device_query('++mode')
   end
   alias operation_mode mode
 
@@ -52,8 +68,7 @@ module PrologixGpib::Usb::Commands
   end
 
   def timeout
-    write('++read_tmo_ms')
-    readline
+    device_query('++read_tmo_ms')
   end
 
   # PrologixGPIB-USB controller can be configured to automatically address instruments to 'talk' after sending a command in order to read the response.
@@ -73,8 +88,7 @@ module PrologixGpib::Usb::Commands
   alias set_auto_read_after_write auto=
 
   def auto
-    write('++auto')
-    readline
+    device_query('++auto')
   end
   alias auto_read_after_write auto
 
@@ -86,8 +100,7 @@ module PrologixGpib::Usb::Commands
   alias set_address address=
 
   def address
-    write('++addr')
-    readline
+    device_query('++addr')
   end
 
   # This command enables or disables the assertion of the EOI signal with the last character of any command sent over GPIB port.
@@ -106,8 +119,7 @@ module PrologixGpib::Usb::Commands
   end
 
   def eoi
-    write('++eoi')
-    readline
+    device_query('++eoi')
   end
 
   # This command specifies GPIB termination characters. When data from host is received over USB, all non-escaped LF, CR and ESC characters are removed and GPIB terminators, as specified by this command, are appended before sending the data to instruments.
@@ -125,8 +137,7 @@ module PrologixGpib::Usb::Commands
   end
 
   def eos
-    write('++eos')
-    readline
+    device_query('++eos')
   end
 
   # This command enables or disables the appending of a user specified character (see eot_char) to USB output whenever EOI is detected while reading a character from the GPIBport.
@@ -144,8 +155,7 @@ module PrologixGpib::Usb::Commands
   end
 
   def eot
-    write('++eot_enable')
-    return readline
+    device_query('++eot_enable')
   end
 
   def eot_char=(char)
@@ -153,21 +163,18 @@ module PrologixGpib::Usb::Commands
   end
 
   def eot_char
-    write('++eot_char')
-    readline
+    device_query('++eot_char')
   end
 
   def version
-    write('++ver')
-    readline
+    device_query('++ver')
   end
 
   def savecfg
-    write('++savecfg')
-    readline
+    device_query('++savecfg')
   end
 
-  def trigger(addr_list = [addr])
+  def trigger(addr_list = [])
     write("++trg #{addr_list.join(' ')}")
   end
 
@@ -175,11 +182,17 @@ module PrologixGpib::Usb::Commands
     write('++rst')
   end
 
+  def flush
+    return unless connected?
+
+    loop until serial_port.getbyte.nil?
+  end
+
   private
 
-  def connected?
-    raise Error, 'ConnectionError: No open Prologix device connections.' if @serial_port.nil?
-
-    true
+  def device_query(command)
+    flush
+    write(command)
+    readline
   end
 end

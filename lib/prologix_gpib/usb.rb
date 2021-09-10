@@ -5,13 +5,18 @@ module PrologixGpib::Usb
 
   EOL = "\r\n"
 
-  def initialize(path = nil, options = {})
-    path_array = path.nil? ? device_paths : [path]
-    open_serial_port(path_array)
-    self.mode = options.fetch :mode, :controller
-    self.address = options.fetch :address, 9
+  attr_reader :serial_port
+
+  def initialize(path = nil, mode: :controller, address: 9)
+    paths = path.nil? ? device_paths : [path]
+    open_serial_port(paths)
+    flush
+    self.mode = mode
+    self.address = address
     self.auto = :disable
     self.eos = 0
+
+    yield self if block_given?
   end
 
   def close
@@ -40,11 +45,6 @@ module PrologixGpib::Usb
     @serial_port.gets.chomp
   end
 
-  # RubySerial::Posix::Termios
-  def serial_port
-    @serial_port
-  end
-
   private
 
   def device_paths
@@ -67,5 +67,11 @@ module PrologixGpib::Usb
       return if readline.include? 'Prologix'
     end
     raise Error, 'No Prologix USB controllers found.'
+  end
+
+  def connected?
+    raise Error, 'ConnectionError: No open Prologix device connections.' if @serial_port.nil?
+
+    true
   end
 end
