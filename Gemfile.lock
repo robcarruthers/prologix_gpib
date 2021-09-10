@@ -39,7 +39,7 @@ DEPENDENCIES
   prologix_gpib!
   pry
   rake (~> 10.0)
-  rubyserial
+  rubyserial (~> 0.6)
 
 BUNDLED WITH
    2.2.26

@@ -7,4 +7,4 @@ gemspec
 
 gem 'pry'
 
-gem 'rubyserial'
+gem 'rubyserial', '~> 0.6'
