@@ -1,11 +1,11 @@
 module PrologixGpib::Usb::Commands
   def config
     error_message = 'Error'
-    ver = version.split('version').map(&:strip)
-    return { error: error_message } unless ver.count == 2 && ver[0].include?('Prologix')
+    device_version = version.split('version').map(&:strip)
+    return { error: error_message } unless device_version.count == 2 && device_version[0].include?('Prologix')
     conf = {}
-    conf[:device_name] = ver[0]
-    conf[:firmware] = ver[1]
+    conf[:device_name] = device_version[0]
+    conf[:firmware] = device_version[1]
     conf[:mode] = { '1' => 'Controller', '0' => 'Device' }.fetch(mode, error_message)
     conf[:device_address] = address[/([1-9])/].nil? ? error_message : address[/([1-9])/]
     conf[:auto_read] = { '1' => 'Enabled', '0' => 'Disabled', 'Unrecognized command' => 'NA' }.fetch(auto, error_message)
@@ -35,6 +35,7 @@ module PrologixGpib::Usb::Commands
       end
     conf[:eot] = { '1' => 'Enabled', '0' => 'Disabled' }.fetch(eot, error_message)
     eot_str = eot_char
+
     # conf[:eot_char] = eot_str.to_i.chr[/([ -~])/].nil? ? error_message : "'#{eot_str.to_i.chr}', ascii #{eot_str}"
     conf
   end
@@ -172,6 +173,10 @@ module PrologixGpib::Usb::Commands
 
   def savecfg
     device_query('++savecfg')
+  end
+
+  def spoll(address = nil)
+    device_query
   end
 
   def trigger(addr_list = [])

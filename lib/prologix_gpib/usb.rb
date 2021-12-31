@@ -1,7 +1,9 @@
 module PrologixGpib::Usb
-  require 'rubyserial'
+  require 'timeout'
+  require 'prologix_gpib/usb/commands'
 
-  class Error < StandardError; end
+  class Error < StandardError
+  end
 
   EOL = "\r\n"
 
@@ -42,7 +44,16 @@ module PrologixGpib::Usb
   def readline
     return unless connected?
 
-    @serial_port.gets.chomp
+    t = Timeout.timeout(1, Timeout::Error, 'No response from Data Acquisistion') { getline }
+  end
+
+  def sr(register = nil)
+    write 'SR'
+    write '++read eoi'
+    array = []
+    (1..24).each { array << readline }
+    array.map! { |byte| '%08b' % byte.to_i }
+    register.nil? ? array : array[register - 1]
   end
 
   private
@@ -64,7 +75,7 @@ module PrologixGpib::Usb
     paths.each do |path|
       @serial_port = Serial.new(path)
       write('++ver')
-      return if readline.include? 'Prologix'
+      return if getline.include? 'Prologix'
     end
     raise Error, 'No Prologix USB controllers found.'
   end
@@ -73,5 +84,13 @@ module PrologixGpib::Usb
     raise Error, 'ConnectionError: No open Prologix device connections.' if @serial_port.nil?
 
     true
+  end
+
+  # This method will block until the EOL terminator is received
+  # The lower level gets method is pure ruby, so can be safely used with Timeout.
+  def getline
+    return unless connected?
+
+    @serial_port.gets(EOL).chomp
   end
 end

@@ -9,7 +9,7 @@ require 'prologix_gpib'
 # (If you use this, don't forget to add pry to your Gemfile!)
 # require "pry"
 # Pry.start
-plx = Prologix::UsbController.new
+# plx = Prologix::UsbController.new
 
 require 'irb'
 IRB.start(__FILE__)
