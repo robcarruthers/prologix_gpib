@@ -24,13 +24,18 @@ module PrologixGpib
       self
     end
 
-    def controllers
-      usb_controller_paths
+    # Find first avaliable Prologix controller and return a valid controller object
+    def open
+
+    end
+
+    def controller_paths
+      usb_paths
     end
 
     private
 
-    def usb_controller_paths
+    def usb_paths
       path_str, dir =
         if RubySerial::ON_LINUX
           %w[ttyUSB /dev/]

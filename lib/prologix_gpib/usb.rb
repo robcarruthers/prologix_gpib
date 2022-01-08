@@ -5,12 +5,12 @@ module PrologixGpib::Usb
   class Error < StandardError
   end
 
-  EOL = "\r\n"
+  EOL = "\r\n".freeze
 
   attr_reader :serial_port
 
-  def initialize(path = nil, mode: :controller, address: 9)
-    paths = path.nil? ? device_paths : [path]
+  def initialize(path, mode: :controller, address: 9)
+    paths = path.nil? ? PrologixGpib.controller_paths : [path]
     open_serial_port(paths)
     flush
     self.mode = mode
@@ -51,25 +51,12 @@ module PrologixGpib::Usb
     write 'SR'
     write '++read eoi'
     array = []
-    (1..24).each { array << readline }
+    24.times { array << readline }
     array.map! { |byte| '%08b' % byte.to_i }
     register.nil? ? array : array[register - 1]
   end
 
   private
-
-  def device_paths
-    path_str, dir =
-      if RubySerial::ON_LINUX
-        %w[ttyUSB /dev/]
-      elsif RubySerial::ON_WINDOWS
-        ['TODO: Implement find device for Windows', 'You lazy bugger']
-      else
-        %w[tty.usbserial /dev/]
-      end
-
-    Dir.glob("#{dir}#{path_str}*")
-  end
 
   def open_serial_port(paths)
     paths.each do |path|
