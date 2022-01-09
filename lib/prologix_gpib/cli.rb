@@ -13,7 +13,7 @@ module PrologixGpib
           Terminal::Table.new do |t|
             t.title = 'Prologix Controllers'
             t.headings = %w[index Controller Version Path]
-            PrologixGpib.controller_paths.each.with_index do |path, index|
+            PrologixGpib.usb_paths.each.with_index do |path, index|
               device = PrologixGpib::UsbController.new(path)
               str = device.version.split('version')
               t.add_row [index.to_s, str[0], str[1], path]
@@ -30,7 +30,7 @@ module PrologixGpib
     def info
       return unless controllers_connected?
 
-      paths = options[:path].nil? ? PrologixGpib.controller_paths : [options[:path]]
+      paths = options[:path].nil? ? PrologixGpib.usb_paths : [options[:path]]
 
       paths.each do |path|
         hash = PrologixGpib::UsbController.new(path).config
@@ -43,7 +43,7 @@ module PrologixGpib
     private
 
     def controllers_connected?
-      PrologixGpib.controller_paths.count >= 1
+      PrologixGpib.usb_paths.count >= 1
     end
 
     def titleise(string)
