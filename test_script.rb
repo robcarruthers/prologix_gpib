@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
 require 'prologix_gpib'
-plx = PrologixGpib::UsbController.new
-puts plx.config
+paths = PrologixGpib.usb_paths
+
+device = PrologixGpib::UsbController.new([paths[0])
+puts device.config

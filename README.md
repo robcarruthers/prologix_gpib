@@ -54,32 +54,32 @@ $ plx info 0
 
 ### Playing in Console
 
-```ruby
-$ irb
+I'm enamoured by this interface, I'd like a more ruby like way of finding and connecting controllers, that works with Ethernet controllers too.
 
+```ruby
 irb(main):001:0> require 'prologix_gpib'
 => true
 
-irb(main):002:0> device = PrologixGpib::UsbController.new('/dev/tty.usbserial-PX9HPBMB')
-=> #<PrologixGpib::UsbController:0x000000014632c610 @serial_port=#<Serial:0x000000014632c4d0 @config=#<RubySerial::Posix::Termios:0x0000000146327e30>, @fd=9, @open=true>>\
+irb(main):002:0> paths = PrologixGpib.usb_paths
+=> ["/dev/tty.usbserial-PX9HPBMB", "/dev/tty.usbserial-PXEGWA9A"]
 
-irb(main):003:0> device.config
-=>  {:device_name=>"Prologix GPIB-USB Controller",
- :firmware=>"6.101",
- :mode=>"Controller",
- :device_address=>"9",
- :auto_read=>"Disabled",
- :read_timeout=>"200",
- :eoi_assertion=>"Enabled",
- :eos=>"Append CR+LF",
- :eot=>"Enabled"}
+irb(main):003:0> device = PrologixGpib::UsbController.new(paths[0])
+=> #<PrologixGpib::UsbController:0x00000001574c4098 @serial_port=#<Serial:0x00000001574bfef8 @config=#<RubySerial::Posix::Termios:0x00000001574bf728>, @fd=9, @open=true>>
 
-irb(main):004:0> device.address
+irb(main):004:0> device.config
+=>  {:device_name=>"Prologix GPIB-USB Controller", :firmware=>"6.101", :mode=>"Device", :device_address=>"9", :auto_read=>"NA", :read_timeout=>"NA", :eoi_assertion=>"Enabled", :eos=>"Append CR+LF", :eot=>"Enabled"}
+
+irb(main):005:0> device.address
 => "9"
 
-irb(main):005:0> device.mode = :controller
+irb(main):006:0> device.mode = :controller
 => :controller
 
+irb(main):007:0> device.mode
+=> "0"
+
+irb(main):008:0> device.config
+=> {:device_name=>"Prologix GPIB-USB Controller", :firmware=>"6.101", :mode=>"Controller", :device_address=>"9", :auto_read=>"Disabled", :read_timeout=>"200", :eoi_assertion=>"Enabled", :eos=>"Append CR+LF", :eot=>"Enabled"}
 ```
 
 ### Firmware update
