@@ -12,14 +12,14 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Prologix GPIB controller ruby wrapper.'
   spec.description = 'Ruby wrapper for the Prologix GPIB controllers, USB & Ethernet.'
-  spec.homepage = 'https://codemuster.co.nz'
+  spec.homepage = 'https://github.com/robcarruthers/prologix_gpib'
   spec.license = 'MIT'
 
-  spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
+  # spec.metadata['allowed_push_host'] = "http://mygemserver.com'"
 
   spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = 'https://codemuster.co.nz'
-  spec.metadata['changelog_uri'] = 'https://codemuster.co.nz'
+  spec.metadata['source_code_uri'] = 'https://github.com/robcarruthers/prologix_gpib'
+  spec.metadata['changelog_uri'] = 'https://github.com/robcarruthers/prologix_gpib'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
