@@ -2,5 +2,5 @@
 require 'prologix_gpib'
 paths = PrologixGpib.usb_paths
 
-device = PrologixGpib::UsbController.new([paths[0])
+device = PrologixGpib::UsbController.new(paths[0])
 puts device.config
