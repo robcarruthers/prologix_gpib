@@ -6,5 +6,3 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'pry'
-
-gem 'rubyserial', '~> 0.6'
