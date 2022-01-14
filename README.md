@@ -54,7 +54,7 @@ $ plx info 0
 
 ### Playing in Console
 
-I'm enamoured by this interface, I'd like a more ruby like way of finding and connecting controllers, that works with Ethernet controllers too.
+I'm not enamoured by this interface, I'd like a more ruby like way of finding and connecting controllers thats less clunky. It works for now, but may change as we refine the implementation.
 
 ```ruby
 irb(main):001:0> require 'prologix_gpib'
