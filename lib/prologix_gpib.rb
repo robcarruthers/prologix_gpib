@@ -14,6 +14,8 @@ module PrologixGpib
 
   class LanController
     include PrologixGpib::Lan
+    include PrologixGpib::Lan::Utils
+    include PrologixGpib::Lan.commands
   end
 
   # Ideally this class needs to handle finding all avaliable Prologix GPIB controllers (USB and Ethernet),
