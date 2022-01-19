@@ -1,11 +1,11 @@
 PATH
   remote: .
   specs:
-    prologix_gpib (0.4.3)
-      activesupport
-      rubyserial
+    prologix_gpib (0.4.4)
+      activesupport (~> 7.0.1)
+      rubyserial (~> 0.6.0)
       terminal-table (~> 3.0.2)
-      thor
+      thor (~> 1.2.1)
 
 GEM
   remote: https://rubygems.org/
@@ -43,7 +43,6 @@ DEPENDENCIES
   prologix_gpib!
   pry
   rake (~> 10.0)
-  rubyserial (~> 0.6)
 
 BUNDLED WITH
    2.2.32

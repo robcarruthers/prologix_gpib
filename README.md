@@ -54,6 +54,21 @@ $ plx info 0
 
 ### Playing in Console
 
+#### Finding Controllers
+
+```irb
+irb(main):001:0> f = PrologixGpib::Finder.new
+=> #<PrologixGpib::Finder:0x00000001089844b0>
+irb(main):002:0> f.avaliable_controllers
+=> {
+	:usb=>["/dev/tty.usbserial-PX9HPBMB", "/dev/tty.usbserial-PXEGWA9A"],
+	:lan=>["192.168.10.161", "192.168.10.165"]
+}
+
+```
+
+#### Working with Controllers
+
 I'm not enamoured by this interface, I'd like a more ruby like way of finding and connecting controllers thats less clunky. It works for now, but may change as we refine the implementation.
 
 ```ruby
@@ -67,7 +82,16 @@ irb(main):003:0> device = PrologixGpib::UsbController.new(paths[0])
 => #<PrologixGpib::UsbController:0x00000001574c4098 @serial_port=#<Serial:0x00000001574bfef8 @config=#<RubySerial::Posix::Termios:0x00000001574bf728>, @fd=9, @open=true>>
 
 irb(main):004:0> device.config
-=>  {:device_name=>"Prologix GPIB-USB Controller", :firmware=>"6.101", :mode=>"Device", :device_address=>"9", :auto_read=>"NA", :read_timeout=>"NA", :eoi_assertion=>"Enabled", :eos=>"Append CR+LF", :eot=>"Enabled"}
+=>  {
+	:device_name=>"Prologix GPIB-USB Controller",
+	:firmware=>"6.101", :mode=>"Device",
+	:device_address=>"9",
+	:auto_read=>"NA",
+	:read_timeout=>"NA",
+	:eoi_assertion=>"Enabled",
+	:eos=>"Append CR+LF",
+	:eot=>"Enabled"
+}
 
 irb(main):005:0> device.address
 => "9"
@@ -79,7 +103,16 @@ irb(main):007:0> device.mode
 => "0"
 
 irb(main):008:0> device.config
-=> {:device_name=>"Prologix GPIB-USB Controller", :firmware=>"6.101", :mode=>"Controller", :device_address=>"9", :auto_read=>"Disabled", :read_timeout=>"200", :eoi_assertion=>"Enabled", :eos=>"Append CR+LF", :eot=>"Enabled"}
+=> {
+	:device_name=>"Prologix GPIB-USB Controller",
+	:firmware=>"6.101", :mode=>"Controller",
+	:device_address=>"9",
+	:auto_read=>"Disabled",
+	:read_timeout=>"200",
+	:eoi_assertion=>"Enabled",
+	:eos=>"Append CR+LF",
+	:eot=>"Enabled"
+}
 ```
 
 ### Firmware update

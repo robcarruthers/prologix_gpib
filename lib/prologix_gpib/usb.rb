@@ -1,6 +1,5 @@
 module PrologixGpib::Usb
   require 'timeout'
-  require 'prologix_gpib/usb/commands'
 
   class Error < StandardError
   end

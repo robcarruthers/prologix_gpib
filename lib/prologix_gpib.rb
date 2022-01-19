@@ -3,7 +3,11 @@
 require 'rubyserial'
 require 'prologix_gpib/version'
 require 'prologix_gpib/lan'
+require 'prologix_gpib/lan/utils'
+require 'prologix_gpib/lan/commands'
 require 'prologix_gpib/usb'
+require 'prologix_gpib/usb/commands'
+require 'prologix_gpib/discovery'
 require 'prologix_gpib/cli'
 
 module PrologixGpib
@@ -15,37 +19,17 @@ module PrologixGpib
   class LanController
     include PrologixGpib::Lan
     include PrologixGpib::Lan::Utils
-    include PrologixGpib::Lan.commands
+    include PrologixGpib::Lan::Commands
   end
 
-  # Ideally this class needs to handle finding all avaliable Prologix GPIB controllers (USB and Ethernet),
-  # But for now it simply passes the Prologix USB device paths onto the controller class
+  class Finder
+    include PrologixGpib::Discovery
+  end
+
   # No windows serial support just yet.
   class << self
     def new
       self
-    end
-
-    # Find first avaliable Prologix controller and return a valid controller object
-    def open; end
-
-    def usb_paths
-      usb_controller_paths
-    end
-
-    private
-
-    def usb_controller_paths
-      path_str, dir =
-        if RubySerial::ON_LINUX
-          %w[ttyUSB /dev/]
-        elsif RubySerial::ON_WINDOWS
-          ['TODO: Implement find device for Windows', 'You lazy bugger']
-        else
-          %w[tty.usbserial /dev/]
-        end
-
-      Dir.glob("#{dir}#{path_str}*")
     end
   end
 end

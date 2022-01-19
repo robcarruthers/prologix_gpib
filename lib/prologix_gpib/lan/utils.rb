@@ -47,8 +47,7 @@ module PrologixGpib::Lan::Utils
   NF_REBOOT_CALL_BOOTLOADER = 0
   NF_REBOOT_RESET = 1
 
-  HEADER_FMT = '!2cH6s2x'.freeze
-  IDENTIFY_FMT = HEADER_FMT
+  HEADER_FMT = 'CCna8'.freeze
   IDENTIFY_REPLY_FMT = '!H6c4s4s4s4s4s4s32s'.freeze
   ASSIGNMENT_FMT = '!3xc4s4s4s32x'.freeze
   ASSIGNMENT_REPLY_FMT = '!c3x'.freeze
@@ -69,5 +68,25 @@ module PrologixGpib::Lan::Utils
   MAX_ATTEMPTS = 10
   MAX_TIMEOUT = 0.5
 
-  def discover; end
+  BRADCAST_ADDRESS = '255.255.255.255'
+
+  private
+
+  def devices
+    seq = rand(0..65_535)
+    sock = UDPSocket.new
+    sock.setsockopt(:SOL_SOCKET, :SO_BROADCAST, true)
+
+    data = [NF_MAGIC, NF_IDENTIFY, seq, "\xFF\xFF\xFF\xFF\xFF\xFF"].pack(HEADER_FMT)
+    sock.send(data, 0, BRADCAST_ADDRESS, NETFINDER_SERVER_PORT)
+
+    while true
+      data, addr = sock.recvfrom(256)
+      p "From addr: #{addr}, msg: #{data}"
+      # p r_data.unpack('CCna8')
+      # puts ''
+    end
+
+    sock.close
+  end
 end
