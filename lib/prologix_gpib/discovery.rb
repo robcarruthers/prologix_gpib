@@ -1,15 +1,109 @@
 module PrologixGpib::Discovery
+  require 'socket'
+  require 'ipaddr'
+  require 'bindata'
+  require 'timeout'
+
   class Error < StandardError
   end
 
+  class IPAddr < BinData::Primitive
+    array :octets, type: :uint8, initial_length: 4
+
+    def set(val)
+      self.octets = val.split(/\./).map(&:to_i)
+    end
+
+    def get
+      self.octets.map(&:to_s).join('.')
+    end
+  end
+
+  class MacAddr < BinData::Primitive
+    array :octets, type: :uint8, initial_length: 6
+
+    def set(val)
+      self.octets = val.split(/:/).map(&:to_i)
+    end
+
+    def get
+      self.octets.map { |octet| '%02x' % octet }.join(':')
+    end
+  end
+
+  class NFHeader < BinData::Record
+    endian :big
+    uint8 :magic
+    uint8 :identify
+    uint16 :seq
+    mac_addr :eth_addr
+    string :reserved, read_length: 2
+  end
+
+  class NFIdentifyReply < BinData::Record
+    endian :big
+    nf_header :header
+    uint16 :uptime_days
+    uint8 :uptime_hrs
+    uint8 :uptime_mins
+    uint8 :uptime_secs
+    uint8 :mode
+    uint8 :alert
+    uint8 :ip_type
+    ip_addr :addr
+    ip_addr :netmask
+    string :ip_gw, read_length: 4
+    string :app_ver, read_length: 4
+    string :boot_ver, read_length: 4
+    string :hw_ver, read_length: 4
+    stringz :name
+  end
+
+  NF_MAGIC = 0x5a
+  HEADER_FMT = 'CCna8'
+  NF_IDENTIFY = 0
+  NF_IDENTIFY_REPLY = 1
+  BROADCAST_PORT = 3040
+  BROADCAST_ADDRESS = '255.255.255.255'
+  TIMEOUT = 1
+
   def avaliable_controllers
-    { usb: usb_paths, lan: lan_ips }
+    { usb: usb_paths, lan: lan_devices }
   end
 
   private
 
-  def lan_ips
-    %w[192.168.10.161 192.168.10.165]
+  def lan_devices
+    seq = rand(0..65_535)
+    puts "Seq = #{seq}"
+    sock = UDPSocket.new
+    sock.setsockopt(:SOL_SOCKET, :SO_BROADCAST, true)
+
+    data = [NF_MAGIC, NF_IDENTIFY, seq, "\xFF\xFF\xFF\xFF\xFF\xFF"].pack(HEADER_FMT)
+
+    # data = NFHeader.new
+    # data.magic = NF_MAGIC
+    # data.identify = NF_IDENTIFY
+    # data.seq = seq
+
+    # data.mac_addr = "\xFF\xFF\xFF\xFF\xFF\xFF"
+
+    sock.send(data, 0, BROADCAST_ADDRESS, BROADCAST_PORT)
+
+    array = []
+    begin
+      Timeout.timeout(TIMEOUT) do
+        while true
+          data, addr = sock.recvfrom(256)
+          reply = NFIdentifyReply.read(data)
+          p data
+          array << reply if reply.header.seq == seq && reply.header.identify == NF_IDENTIFY_REPLY
+        end
+      end
+    rescue Timeout::Error
+      sock.close
+      array
+    end
   end
 
   def usb_paths

@@ -3,7 +3,6 @@
 require 'rubyserial'
 require 'prologix_gpib/version'
 require 'prologix_gpib/lan'
-require 'prologix_gpib/lan/utils'
 require 'prologix_gpib/lan/commands'
 require 'prologix_gpib/usb'
 require 'prologix_gpib/usb/commands'
@@ -18,7 +17,6 @@ module PrologixGpib
 
   class LanController
     include PrologixGpib::Lan
-    include PrologixGpib::Lan::Utils
     include PrologixGpib::Lan::Commands
   end
 
