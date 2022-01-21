@@ -24,7 +24,7 @@ Or install it yourself as:
 
 ### CLI
 
-The gem comes with a simple cli for querying controllers:
+The gem comes with a simple cli for finding controllers:
 
 ```bash
 $ plx list

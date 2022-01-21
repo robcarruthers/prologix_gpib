@@ -7,6 +7,10 @@ module PrologixGpib::Discovery
   class Error < StandardError
   end
 
+  def avaliable_controllers
+    { usb: usb_device_paths, lan: lan_device_ips }
+  end
+
   class IPAddr < BinData::Primitive
     array :octets, type: :uint8, initial_length: 4
 
@@ -23,7 +27,7 @@ module PrologixGpib::Discovery
     array :octets, type: :uint8, initial_length: 6
 
     def set(val)
-      self.octets = val.split(/:/).map(&:to_i)
+      self.octets = val.split(/:/).map(&:hex)
     end
 
     def get
@@ -37,7 +41,7 @@ module PrologixGpib::Discovery
     uint8 :identify
     uint16 :seq
     mac_addr :eth_addr
-    string :reserved, read_length: 2
+    bit16 :reserved, initial_value: 0x0000
   end
 
   class NFIdentifyReply < BinData::Record
@@ -67,37 +71,32 @@ module PrologixGpib::Discovery
   BROADCAST_ADDRESS = '255.255.255.255'
   TIMEOUT = 1
 
-  def avaliable_controllers
-    { usb: usb_paths, lan: lan_devices }
-  end
-
   private
 
-  def lan_devices
+  def lan_device_ips
     seq = rand(0..65_535)
-    puts "Seq = #{seq}"
+
+    # puts "Seq = #{seq}"
     sock = UDPSocket.new
     sock.setsockopt(:SOL_SOCKET, :SO_BROADCAST, true)
 
-    data = [NF_MAGIC, NF_IDENTIFY, seq, "\xFF\xFF\xFF\xFF\xFF\xFF"].pack(HEADER_FMT)
+    # data = [NF_MAGIC, NF_IDENTIFY, seq, "\xFF\xFF\xFF\xFF\xFF\xFF"].pack(HEADER_FMT)
 
-    # data = NFHeader.new
-    # data.magic = NF_MAGIC
-    # data.identify = NF_IDENTIFY
-    # data.seq = seq
+    data = NFHeader.new
+    data.magic = NF_MAGIC
+    data.identify = NF_IDENTIFY
+    data.seq = seq
+    data.eth_addr = 'FF:FF:FF:FF:FF:FF'
 
-    # data.mac_addr = "\xFF\xFF\xFF\xFF\xFF\xFF"
-
-    sock.send(data, 0, BROADCAST_ADDRESS, BROADCAST_PORT)
-
+    sock.send(data.to_binary_s, 0, BROADCAST_ADDRESS, BROADCAST_PORT)
     array = []
     begin
       Timeout.timeout(TIMEOUT) do
         while true
           data, addr = sock.recvfrom(256)
           reply = NFIdentifyReply.read(data)
-          p data
-          array << reply if reply.header.seq == seq && reply.header.identify == NF_IDENTIFY_REPLY
+          next if array.include?(reply.addr)
+          array << reply.addr if reply.header.seq == seq && reply.header.identify == NF_IDENTIFY_REPLY
         end
       end
     rescue Timeout::Error
@@ -106,7 +105,7 @@ module PrologixGpib::Discovery
     end
   end
 
-  def usb_paths
+  def usb_device_paths
     path_str, dir =
       if RubySerial::ON_LINUX
         %w[ttyUSB /dev/]
