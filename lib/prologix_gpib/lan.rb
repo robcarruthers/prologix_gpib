@@ -3,10 +3,10 @@ module PrologixGpib::Lan
   end
 
   DEVICE_PORT = 1234
-  EOL = "\r\n"
+  EOL = "\r\n".freeze
 
   def initialize(ip, mode: :controller, address: 9)
-    @socket = TCPSocket.new ip, DEVICE_PORT
+    @ip_address = ip
 
     # open_serial_port(paths)
     # flush
@@ -19,7 +19,11 @@ module PrologixGpib::Lan
   end
 
   def version
-    @socket.send "++ver#{EOL}", 0
-    @socket.gets.chomp
+    socket = TCPSocket.new @ip_address, DEVICE_PORT
+    socket.send "++ver#{EOL}", 0
+    sleep 0.1
+    str = socket.gets.chomp
+    socket.close
+    str
   end
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    prologix_gpib (0.4.4)
+    prologix_gpib (0.5.0)
       activesupport (~> 7.0.1)
       bindata (~> 2.4.10)
       rubyserial (~> 0.6.0)

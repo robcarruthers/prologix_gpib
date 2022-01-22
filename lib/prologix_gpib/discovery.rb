@@ -60,7 +60,6 @@ module PrologixGpib::Discovery
     string :app_ver, read_length: 4
     string :boot_ver, read_length: 4
     string :hw_ver, read_length: 4
-    stringz :name
   end
 
   NF_MAGIC = 0x5a
@@ -90,16 +89,25 @@ module PrologixGpib::Discovery
 
     sock.send(data.to_binary_s, 0, BROADCAST_ADDRESS, BROADCAST_PORT)
     array = []
+    replies = []
     begin
       Timeout.timeout(TIMEOUT) do
         while true
-          data, addr = sock.recvfrom(256)
-          reply = NFIdentifyReply.read(data)
-          next if array.include?(reply.addr)
-          array << reply.addr if reply.header.seq == seq && reply.header.identify == NF_IDENTIFY_REPLY
+          data, addr = sock.recvfrom(1000)
+          replies << data
         end
       end
     rescue Timeout::Error
+      replies.each do |data|
+        begin
+          reply = NFIdentifyReply.read(data)
+        rescue EOFError
+          # About 1% of responses are not always as expected from the controller
+          next
+        end
+        next if array.include?(reply.addr)
+        array << reply.addr if reply.header.seq == seq && reply.header.identify == NF_IDENTIFY_REPLY
+      end
       sock.close
       array
     end

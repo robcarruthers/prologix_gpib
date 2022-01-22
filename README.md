@@ -28,14 +28,15 @@ The gem comes with a simple cli for finding controllers:
 
 ```bash
 $ plx list
-+-------------------------------------------------------------------------------+
-|                             Prologix Controllers                              |
-+-------+-------------------------------+---------+-----------------------------+
-| index | Controller                    | Version | Path                        |
-+-------+-------------------------------+---------+-----------------------------+
-| 0     | Prologix GPIB-USB Controller  |  6.101  | /dev/tty.usbserial-PX9HPBMB |
-| 1     | Prologix GPIB-USB Controller  |  6.107  | /dev/tty.usbserial-PXEGWA9A |
-+-------+-------------------------------+---------+-----------------------------+
++------------------------------------------------------------------------------------+
+|                                Prologix Controllers                                |
++-------+-------------------------------+--------------+-----------------------------+
+| index | Controller                    | Version      | Location                    |
++-------+-------------------------------+--------------+-----------------------------+
+| 0     | Prologix GPIB-USB Controller  |  6.101       | /dev/tty.usbserial-PX9HPBMB |
+| 1     | Prologix GPIB-USB Controller  |  6.107       | /dev/tty.usbserial-PXEGWA9A |
+| 2     | Prologix GPIB-LAN Controller  |  01.03.00.00 | 192.168.10.161              |
++-------+-------------------------------+--------------+-----------------------------+
 
 $ plx info 0
 
