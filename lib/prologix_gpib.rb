@@ -11,6 +11,11 @@ require 'prologix_gpib/cli'
 
 module PrologixGpib
   class UsbController
+
+    def test
+      puts 'testing'
+    end
+    
     include PrologixGpib::Usb
     include PrologixGpib::Usb::Commands
   end
