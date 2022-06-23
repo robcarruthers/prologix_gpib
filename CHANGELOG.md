@@ -1,3 +1,7 @@
+# 0.5.3
+
+- Moved repo to Gitlab
+
 # 0.5.2 (June 23, 2022)
 
 ## Bug Fixes:
