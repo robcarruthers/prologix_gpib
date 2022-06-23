@@ -52,6 +52,18 @@ $ plx info 0
 	EOS: Append CR+LF
 	EOT: Enabled
 
+plx info 3
+
+  Prologix gpib-ethernet controller
+	Path: 192.168.10.127
+	Firmware: 01.06.06.00
+	Mode: Controller
+	Device Address: 5
+	Auto Read: Enabled
+	Read Timeout: 500
+	Eoi Assertion: Enabled
+	Eos: Append CR+LF
+	Eot: Disabled
 ```
 
 ### Finding Controllers
