@@ -69,7 +69,7 @@ irb(main):002:0> controllers = f.avaliable_controllers
 
 ### Working with Controllers
 
-I'm not enamoured by this interface, I'd like a more ruby like way of finding and connecting controllers thats less clunky. It works for now, but may change as we refine the implementation.
+I'm not enamoured by this interface, I'd like a more ruby like way of finding and connecting controllers thats less clunky. It works for now, but may change as we refine things.
 
 ```ruby
 irb(main):003:0> device = PrologixGpib::UsbController.new(controllers[:usb][0])

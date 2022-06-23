@@ -2,28 +2,34 @@ require 'thor'
 require 'pp'
 require 'prologix_gpib'
 require 'terminal-table'
+require 'resolv'
 
 module PrologixGpib
   class CLI < Thor
+    def initialize(*args)
+      super
+      @controllers = PrologixGpib::Finder.new.avaliable_controllers
+    end
+
     desc 'list', 'List all connected controllers'
 
     def list
-      puts controller_table(PrologixGpib::Finder.new.avaliable_controllers)
+      puts controller_table(@controllers)
     end
 
-    desc 'info', 'Display Controller information'
-    option :path, alias: :p
-    def info
+    desc 'info [INDEX]', 'Display Controller information'
+    option :path, aliases: :p
+    def info(index)
       return unless controllers_connected?
 
-      paths = options[:path].nil? ? PrologixGpib.usb_paths : [options[:path]]
+      controller_paths = @controllers.map { |k, v| v }.flatten
 
-      paths.each do |path|
-        hash = PrologixGpib::UsbController.new(path).config
-        puts "\n  #{titleise hash.delete(:device_name)}"
-        puts "\tPath: #{path}"
-        hash.each { |k, v| puts "\t#{titleise(k)}: #{v}" }
-      end
+      path = controller_paths[index.to_i]
+      hash = ip_address?(path) ? PrologixGpib::LanController.new(path).config : PrologixGpib::UsbController.new(path).config
+
+      puts "\n  #{titleise hash.delete(:device_name)}"
+      puts "\tPath: #{path}"
+      hash.each { |k, v| puts "\t#{titleise(k)}: #{v}" }
     end
 
     private
@@ -59,11 +65,15 @@ module PrologixGpib
     end
 
     def controllers_connected?
-      PrologixGpib.usb_paths.count >= 1
+      @controllers[:usb].any? || @controllers[:lan].any?
     end
 
     def titleise(string)
       string.to_s.split('_').map(&:capitalize).join(' ')
+    end
+
+    def ip_address?(string)
+      string =~ Resolv::IPv4::Regex ? true : false
     end
   end
 end

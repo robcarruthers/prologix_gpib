@@ -9,8 +9,7 @@ module PrologixGpib::Usb
   attr_reader :serial_port
 
   def initialize(path, mode: :controller, address: 9)
-    paths = path.nil? ? PrologixGpib.controller_paths : [path]
-    open_serial_port(paths)
+    open_serial_port(path)
     flush
     self.mode = mode
     self.address = address
@@ -28,10 +27,10 @@ module PrologixGpib::Usb
     @serial_port.nil?
   end
 
-  def write(str)
+  def write(string)
     return unless connected?
 
-    @serial_port.write("#{str}#{EOL}")
+    @serial_port.write("#{string}#{EOL}")
   end
 
   def read(bytes)
@@ -43,7 +42,7 @@ module PrologixGpib::Usb
   def readline
     return unless connected?
 
-    t = Timeout.timeout(1, Timeout::Error, 'No response from Data Acquisistion') { getline }
+    t = Timeout.timeout(1, Timeout::Error, 'No response from device') { getline }
   end
 
   def sr(register = nil)
@@ -57,12 +56,11 @@ module PrologixGpib::Usb
 
   private
 
-  def open_serial_port(paths)
-    paths.each do |path|
-      @serial_port = Serial.new(path)
-      write('++ver')
-      return if getline.include? 'Prologix'
-    end
+  def open_serial_port(path)
+    @serial_port = Serial.new(path)
+    write('++ver')
+    return if getline.include? 'Prologix'
+
     raise Error, 'No Prologix USB controllers found.'
   end
 
@@ -72,11 +70,23 @@ module PrologixGpib::Usb
     true
   end
 
+  def flush
+    return unless connected?
+
+    loop until serial_port.getbyte.nil?
+  end
+
   # This method will block until the EOL terminator is received
   # The lower level gets method is pure ruby, so can be safely used with Timeout.
   def getline
     return unless connected?
 
     @serial_port.gets(EOL).chomp
+  end
+
+  def device_query(command)
+    flush
+    write(command)
+    readline
   end
 end

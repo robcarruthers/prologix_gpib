@@ -3,26 +3,24 @@
 require 'rubyserial'
 require 'prologix_gpib/version'
 require 'prologix_gpib/lan'
-require 'prologix_gpib/lan/commands'
 require 'prologix_gpib/usb'
-require 'prologix_gpib/usb/commands'
+require 'prologix_gpib/commands'
 require 'prologix_gpib/discovery'
 require 'prologix_gpib/cli'
 
 module PrologixGpib
   class UsbController
-
     def test
       puts 'testing'
     end
-    
+
     include PrologixGpib::Usb
-    include PrologixGpib::Usb::Commands
+    include PrologixGpib::Commands
   end
 
   class LanController
     include PrologixGpib::Lan
-    include PrologixGpib::Lan::Commands
+    include PrologixGpib::Commands
   end
 
   class Finder

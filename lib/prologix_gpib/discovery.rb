@@ -68,7 +68,7 @@ module PrologixGpib::Discovery
   NF_IDENTIFY_REPLY = 1
   BROADCAST_PORT = 3040
   BROADCAST_ADDRESS = '255.255.255.255'
-  TIMEOUT = 1
+  TIMEOUT = 0.5
 
   private
 

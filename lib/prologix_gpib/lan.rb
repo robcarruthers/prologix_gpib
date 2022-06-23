@@ -1,3 +1,5 @@
+require 'timeout'
+
 module PrologixGpib::Lan
   class Error < StandardError
   end
@@ -6,7 +8,7 @@ module PrologixGpib::Lan
   EOL = "\r\n".freeze
 
   def initialize(ip, mode: :controller, address: 9)
-    @ip_address = ip
+    open_socket(ip)
 
     # open_serial_port(paths)
     # flush
@@ -18,12 +20,51 @@ module PrologixGpib::Lan
     yield self if block_given?
   end
 
-  def version
-    socket = TCPSocket.new @ip_address, DEVICE_PORT
-    socket.send "++ver#{EOL}", 0
+  def write(command)
+    return unless connected?
+
+    @socket.send "#{command}#{EOL}", 0
     sleep 0.1
-    str = socket.gets.chomp
-    socket.close
-    str
+  end
+
+  def read
+    return unless connected?
+
+    @socket.gets.chomp
+  end
+
+  private
+
+  def open_socket(ip)
+    @socket = TCPSocket.new ip, DEVICE_PORT
+    write('++ver')
+    return if getline.include? 'Prologix'
+
+    raise Error, 'No Prologix LAN controllers found.'
+  end
+
+  def connected?
+    raise Error, 'ConnectionError: No open Prologix device connections.' if @socket.nil?
+
+    true
+  end
+
+  def readline
+    return unless connected?
+
+    t = Timeout.timeout(1, Timeout::Error, "No response from device at #{@socket.peeraddr[3]}") { getline }
+  end
+
+  # This method will block until the EOL terminator is received
+  # The lower level gets method is pure ruby, so can be safely used with Timeout.
+  def getline
+    return unless connected?
+
+    @socket.gets(EOL).chomp
+  end
+
+  def device_query(command)
+    write(command)
+    readline
   end
 end

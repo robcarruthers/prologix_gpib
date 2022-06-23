@@ -1,4 +1,4 @@
-module PrologixGpib::Usb::Commands
+module PrologixGpib::Commands
   def config
     error_message = 'Error'
     device_version = version.split('version').map(&:strip)
@@ -40,7 +40,7 @@ module PrologixGpib::Usb::Commands
     conf
   end
 
-  #  This command configures the Prologix GPIB-USB controller to be a :controller or :device.
+  #   #  This command configures the Prologix GPIB-USB controller to be a :controller or :device.
   def mode=(op_mode)
     mode =
       case op_mode
@@ -60,8 +60,8 @@ module PrologixGpib::Usb::Commands
   end
   alias operation_mode mode
 
-  # Timeout value, in milliseconds, used in the read command and spoll command.
-  # Any value between 1 and 3000 milliseconds.
+  # # Timeout value, in milliseconds, used in the read command and spoll command.
+  # # Any value between 1 and 3000 milliseconds.
   def timeout=(milliseconds)
     return unless connected? || milliseconds.class != Integer
 
@@ -72,8 +72,8 @@ module PrologixGpib::Usb::Commands
     device_query('++read_tmo_ms')
   end
 
-  # PrologixGPIB-USB controller can be configured to automatically address instruments to 'talk' after sending a command in order to read the response.
-  # *** Avaliable in Controller mode. When enabled can cause the prologix controller to lockup. ***
+  # # PrologixGPIB-USB controller can be configured to automatically address instruments to 'talk' after sending a command in order to read the response.
+  # # *** Avaliable in Controller mode. When enabled can cause the prologix controller to lockup. ***
   def auto=(auto_mode)
     mode =
       case auto_mode
@@ -93,8 +93,8 @@ module PrologixGpib::Usb::Commands
   end
   alias auto_read_after_write auto
 
-  # In :controller mode, address refers to the GPIB address of the instrument being controlled.
-  # In :device mode, it is the address of the GPIB peripheral that Prologix GPIB-USB controller is emulating.
+  # # In :controller mode, address refers to the GPIB address of the instrument being controlled.
+  # # In :device mode, it is the address of the GPIB peripheral that Prologix GPIB-USB controller is emulating.
   def address=(addr)
     write("++addr #{addr}")
   end
@@ -104,8 +104,8 @@ module PrologixGpib::Usb::Commands
     device_query('++addr')
   end
 
-  # This command enables or disables the assertion of the EOI signal with the last character of any command sent over GPIB port.
-  # Some instruments require EOI signal to be asserted in order to properly detect the end of a command.
+  # # This command enables or disables the assertion of the EOI signal with the last character of any command sent over GPIB port.
+  # # Some instruments require EOI signal to be asserted in order to properly detect the end of a command.
   def eoi=(eoi_mode)
     mode =
       case eoi_mode
@@ -123,13 +123,13 @@ module PrologixGpib::Usb::Commands
     device_query('++eoi')
   end
 
-  # This command specifies GPIB termination characters. When data from host is received over USB, all non-escaped LF, CR and ESC characters are removed and GPIB terminators, as specified by this command, are appended before sending the data to instruments.
-  # This command does not affect data from instruments received over GPIB port.
-  # EXAMPLES:
-  # 0 Append CR+LF
-  # 1 Append CR to instrument commands
-  # 2 Append LF to instrument commands
-  # 3 Do not append anything to instrument commands
+  # # This command specifies GPIB termination characters. When data from host is received over USB, all non-escaped LF, CR and ESC characters are removed and GPIB terminators, as specified by this command, are appended before sending the data to instruments.
+  # # This command does not affect data from instruments received over GPIB port.
+  # # EXAMPLES:
+  # # 0 Append CR+LF
+  # # 1 Append CR to instrument commands
+  # # 2 Append LF to instrument commands
+  # # 3 Do not append anything to instrument commands
   def eos=(eos_mode)
     error_message = "Invalid arg: '#{eos_mode}'"
     raise ArgumentError, error_message unless [0, 1, 2, 3].include? eos_mode
@@ -141,7 +141,7 @@ module PrologixGpib::Usb::Commands
     device_query('++eos')
   end
 
-  # This command enables or disables the appending of a user specified character (see eot_char) to USB output whenever EOI is detected while reading a character from the GPIBport.
+  # # This command enables or disables the appending of a user specified character (see eot_char) to USB output whenever EOI is detected while reading a character from the GPIBport.
   def eot=(eot_mode)
     mode =
       case eot_mode
@@ -185,19 +185,5 @@ module PrologixGpib::Usb::Commands
 
   def reset
     write('++rst')
-  end
-
-  def flush
-    return unless connected?
-
-    loop until serial_port.getbyte.nil?
-  end
-
-  private
-
-  def device_query(command)
-    flush
-    write(command)
-    readline
   end
 end
