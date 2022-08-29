@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activesupport', '~> 7.0.1'
+  spec.add_dependency 'activesupport', '~> 6.1.0'
   spec.add_dependency 'bindata', '~> 2.4.10'
   spec.add_dependency 'rubyserial', '~> 0.6.0'
   spec.add_dependency 'terminal-table', '~> 3.0.2'

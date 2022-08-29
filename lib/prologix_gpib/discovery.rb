@@ -7,8 +7,15 @@ module PrologixGpib::Discovery
   class Error < StandardError
   end
 
-  def avaliable_controllers
-    { usb: usb_device_paths, lan: lan_device_ips }
+  def avaliable_controllers(interface = :all)
+    case interface
+    when :lan
+      { lan: lan_device_ips }
+    when :usb
+      { usb: usb_device_paths }
+    else
+      { usb: usb_device_paths, lan: lan_device_ips }
+    end
   end
 
   class IPAddr < BinData::Primitive

@@ -6,23 +6,31 @@ require 'resolv'
 
 module PrologixGpib
   class CLI < Thor
-    def initialize(*args)
-      super
-      @controllers = PrologixGpib::Finder.new.avaliable_controllers
-    end
+    desc 'list', 'List available Prologix Controllers'
 
-    desc 'list', 'List all connected controllers'
+    option :usb, aliases: :u
+    option :lan, aliases: :l
 
     def list
+      if options[:usb]
+        @controllers = PrologixGpib::Finder.new.avaliable_controllers(:usb) if options[:usb]
+      elsif options[:lan]
+        @controllers = PrologixGpib::Finder.new.avaliable_controllers(:lan) if options[:lan]
+      else
+        @controllers = PrologixGpib::Finder.new.avaliable_controllers
+      end
       puts controller_table
     end
 
     desc 'info [INDEX]', 'Display Controller information'
+
     option :path, aliases: :p
+
     def info(index)
+      @controllers = PrologixGpib::Finder.new.avaliable_controllers
       return unless controllers_connected?
 
-      path = controller_paths[index.to_i]
+      path = options[:path] ? options[:path] : controller_paths[index.to_i]
       hash = ip_address?(path) ? PrologixGpib::LanController.new(path).config : PrologixGpib::UsbController.new(path).config
 
       puts "\n  #{titleise hash.delete(:device_name)}"

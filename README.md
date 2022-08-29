@@ -24,7 +24,7 @@ Or install it yourself as:
 
 ### CLI
 
-The gem comes with a simple cli for finding controllers:
+The gem comes with a simple cli for finding controllers, either connected via USB or on the LAN you are connected to:
 
 ```bash
 $ plx list
